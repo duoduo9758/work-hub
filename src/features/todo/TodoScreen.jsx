@@ -28,6 +28,9 @@ export default function TodoScreen() {
   const [selectedProjectId, setSelectedProjectId] = useState(null)
   const [currentProject, setCurrentProject] = useState(null) // { id, name, lines, version, ... }
   const [linesLocal, setLinesLocal] = useState([])           // editor's working copy
+  // Bumped on conflict-reload so TodoEditor remounts and its undo/redo
+  // history clears (AC-TODO-L33). Project-switch already unmounts the editor.
+  const [editorEpoch, setEditorEpoch] = useState(0)
 
   const [loadingList, setLoadingList] = useState(true)
   const [loadingProject, setLoadingProject] = useState(false)
@@ -215,6 +218,7 @@ export default function TodoScreen() {
         setLinesLocal(fresh.lines ?? [])
         baseVersionRef.current = fresh.version
         markSaved()
+        setEditorEpoch(e => e + 1) // clear undo/redo history (AC-TODO-L33)
       }
     } catch {
       setProjectError('再読み込みに失敗しました')
@@ -288,6 +292,7 @@ export default function TodoScreen() {
 
         {!projectError && !loadingProject && currentProject && (
           <TodoEditor
+            key={`${currentProject.id}:${editorEpoch}`}
             lines={linesLocal}
             onLinesChange={handleLinesChange}
             readonly={saveStatus === 'conflict'}
