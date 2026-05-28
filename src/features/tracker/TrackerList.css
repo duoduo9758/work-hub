@@ -1,0 +1,63 @@
+.tracker-list {
+  padding: var(--space-lg);
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* ── Loading state ────────────────────────────────── */
+.tracker-list__loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-2xl);
+}
+
+/* ── Action error ─────────────────────────────────── */
+.tracker-list__action-error {
+  font-size: var(--text-sm);
+  color: var(--color-error);
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  background: #fef2f2;
+  border-radius: var(--radius-sm);
+  border: 1px solid #fecaca;
+}
+
+/* ── Toolbar (add button row) ─────────────────────── */
+.tracker-list__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.tracker-list__limit-note {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── Empty state ──────────────────────────────────── */
+.tracker-list__empty {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-2xl) 0;
+  margin: 0;
+}
+
+/* ── Cards ────────────────────────────────────────── */
+.tracker-list__cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.tracker-list__card-item {
+  margin: 0;
+  padding: 0;
+}

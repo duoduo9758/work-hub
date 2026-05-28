@@ -1,0 +1,119 @@
+.tracker-card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  transition: box-shadow 0.15s ease;
+}
+
+/* Pinned state: double border outline */
+.tracker-card--pinned {
+  border-color: var(--color-primary-bg);
+  box-shadow: 0 0 0 1px var(--color-primary-bg);
+}
+
+/* ── Header row ───────────────────────────────────── */
+.tracker-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.tracker-card__title {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+  word-break: break-all;
+}
+
+.tracker-card__pin-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--color-text-muted);
+  padding: 0 var(--space-xs);
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+  border-radius: var(--radius-sm);
+}
+
+.tracker-card__pin-btn:hover {
+  color: var(--color-text);
+}
+
+.tracker-card__pin-btn--active {
+  color: var(--color-primary-bg);
+}
+
+/* ── Date range ───────────────────────────────────── */
+.tracker-card__dates {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ── Progress bar ─────────────────────────────────── */
+.tracker-card__bar-wrap {
+  height: 6px;
+  background: var(--color-surface);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.tracker-card__bar-fill {
+  height: 100%;
+  background: var(--color-primary-bg);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  min-width: 0;
+}
+
+/* ── Stats row ────────────────────────────────────── */
+.tracker-card__stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.tracker-card__detail {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.tracker-card__ended {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  letter-spacing: 0.02em;
+}
+
+.tracker-card__percent {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Action buttons ───────────────────────────────── */
+.tracker-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+}
+
+/* Override tertiary color for delete */
+.tracker-card__delete-btn {
+  color: var(--color-error) !important;
+}

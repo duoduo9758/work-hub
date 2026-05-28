@@ -1,0 +1,99 @@
+.login-screen {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  background: var(--color-bg);
+}
+
+/* ── Card ─────────────────────────────────────────── */
+.login-screen__card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* ── Title ────────────────────────────────────────── */
+.login-screen__title {
+  font-size: var(--text-hero);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+/* ── Field ────────────────────────────────────────── */
+.login-screen__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.login-screen__label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.login-screen__input {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--text-base);
+  font-family: var(--font-family);
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+}
+
+.login-screen__input:focus {
+  border-color: var(--color-primary-bg);
+}
+
+.login-screen__input--error {
+  border-color: var(--color-error);
+}
+
+.login-screen__input:disabled {
+  opacity: 0.6;
+}
+
+/* ── Hint text ────────────────────────────────────── */
+.login-screen__hint {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ── Validation error (inline) ────────────────────── */
+.login-screen__field-error {
+  font-size: var(--text-sm);
+  color: var(--color-error);
+  margin: 0;
+}
+
+/* ── Server error ─────────────────────────────────── */
+.login-screen__error {
+  font-size: var(--text-sm);
+  color: var(--color-error);
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  background: #fef2f2;
+  border-radius: var(--radius-sm);
+  border: 1px solid #fecaca;
+  text-align: center;
+}
+
+/* ── Submit button (full width) ───────────────────── */
+.login-screen__submit {
+  width: 100%;
+  justify-content: center;
+}

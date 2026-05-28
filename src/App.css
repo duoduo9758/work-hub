@@ -1,0 +1,46 @@
+/* ═══════════════════════════════════════════════════
+   App layout
+   ═══════════════════════════════════════════════════ */
+
+/* Full-screen loading during auto-login */
+.app-init {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Main layout ─────────────────────────────────── */
+.app-layout {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ── Temp footer (logout only — replaced in v2+) ── */
+.app-footer {
+  padding: var(--space-lg);
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid var(--color-border);
+}
+
+.app-footer__logout {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease;
+}
+
+.app-footer__logout:hover {
+  color: var(--color-text);
+}
