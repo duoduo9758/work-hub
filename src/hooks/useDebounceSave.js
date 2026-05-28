@@ -106,7 +106,10 @@ export function useDebounceSave({
   }, [delay])
 
   // ── Public API ────────────────────────────────────────────────────────
-  const markDirty = useCallback(() => {
+  // markDirty(customDelay?) — if customDelay is a number, use it instead of
+  // the configured `delay` for the next debounced save. Used by checkbox
+  // toggles which want a snappier 500ms cadence (AC-TODO-L20 v2b).
+  const markDirty = useCallback((customDelay) => {
     if (statusRef.current === 'saving' || statusRef.current === 'saving_slow') {
       pendingDirtyRef.current = true
       return
@@ -117,7 +120,8 @@ export function useDebounceSave({
     }
     setStatus('dirty')
     clearDebounce()
-    debounceTimerRef.current = setTimeout(() => performSave(), delay)
+    const d = typeof customDelay === 'number' ? customDelay : delay
+    debounceTimerRef.current = setTimeout(() => performSave(), d)
   }, [delay, performSave])
 
   const forceSave = useCallback(async () => {

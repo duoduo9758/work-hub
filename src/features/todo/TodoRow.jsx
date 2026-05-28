@@ -18,6 +18,8 @@ import './TodoRow.css'
 //   onMultilinePaste(id, cursorPos, pastedText) — pasted text contains \n
 //   onLineTooLong(reason)        — error display ("1行500文字以内で入力してください")
 //   onFocusConsumed()            — call after parent's focusRequest applied
+//   onToggleChecked(id)          — checkbox click (v2b)
+//   onToggleHasCheckbox(id)      — Ctrl+1 / Cmd+1 (v2b)
 // ═══════════════════════════════════════════════════════════════════════════
 const MAX_VISIBLE_LINES = 6
 const LINE_HEIGHT_PX = 22 // matches CSS line-height
@@ -32,6 +34,8 @@ export default function TodoRow({
   onMultilinePaste,
   onLineTooLong,
   onFocusConsumed,
+  onToggleChecked,
+  onToggleHasCheckbox,
 }) {
   const taRef = useRef(null)
   const isComposingRef = useRef(false)
@@ -89,6 +93,13 @@ export default function TodoRow({
   function handleKeyDown(e) {
     // IME composition: do nothing
     if (isComposingRef.current || e.nativeEvent?.isComposing) return
+
+    // Ctrl+1 / Cmd+1 → toggle hasCheckbox on this line (AC-TODO-L21 v2b)
+    if ((e.ctrlKey || e.metaKey) && (e.key === '1' || e.code === 'Digit1')) {
+      e.preventDefault()
+      onToggleHasCheckbox?.(line.id)
+      return
+    }
 
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -152,14 +163,17 @@ export default function TodoRow({
       className="todo-row"
       style={{ paddingLeft: `${line.indent * 24}px` }}
     >
-      {/* Checkbox placeholder (toggle wiring is v2b) */}
+      {/* Checkbox — click toggles checked (AC-TODO-L20 v2b) */}
       {line.hasCheckbox && (
-        <span
+        <button
+          type="button"
           className={
             'todo-row__checkbox' +
             (line.checked ? ' todo-row__checkbox--checked' : '')
           }
-          aria-hidden="true"
+          onClick={() => onToggleChecked?.(line.id)}
+          aria-label={line.checked ? '完了を解除' : '完了にする'}
+          aria-pressed={line.checked}
         />
       )}
 

@@ -11,7 +11,7 @@
   background: var(--color-surface);
 }
 
-/* ── Checkbox visual placeholder (v2b wires interaction) ── */
+/* ── Checkbox (interactive button, v2b) ── */
 .todo-row__checkbox {
   display: inline-block;
   width: 16px;
@@ -21,6 +21,18 @@
   border-radius: var(--radius-sm);
   flex-shrink: 0;
   background: var(--color-bg);
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.todo-row__checkbox:hover {
+  border-color: var(--color-text-muted);
+}
+
+.todo-row__checkbox:focus-visible {
+  outline: 2px solid var(--color-primary-bg);
+  outline-offset: 2px;
 }
 
 .todo-row__checkbox--checked {

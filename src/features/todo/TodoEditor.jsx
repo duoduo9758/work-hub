@@ -9,6 +9,8 @@ import {
   deleteLine as actDeleteLine,
   pasteMultiline,
   makeNewLine,
+  toggleChecked,
+  toggleHasCheckbox,
 } from './todo-actions'
 import { LINE_MAX_PER_PROJECT } from './todo-store'
 import './TodoEditor.css'
@@ -89,6 +91,15 @@ export default function TodoEditor({ lines, onLinesChange, readonly = false }) {
     setFocusRequest({ id: newLine.id, pos: 0 })
   }, [lines, onLinesChange, showError])
 
+  // ── Checkbox toggles (v2b) — signal `quick: true` so parent uses 500ms save
+  const handleToggleChecked = useCallback((id) => {
+    onLinesChange(toggleChecked(lines, id), { quick: true })
+  }, [lines, onLinesChange])
+
+  const handleToggleHasCheckbox = useCallback((id) => {
+    onLinesChange(toggleHasCheckbox(lines, id), { quick: true })
+  }, [lines, onLinesChange])
+
   const focusConsumed = useCallback(() => setFocusRequest(null), [])
 
   // ── Render ──────────────────────────────────────────────────────────
@@ -122,6 +133,8 @@ export default function TodoEditor({ lines, onLinesChange, readonly = false }) {
                 onMultilinePaste={handlePaste}
                 onLineTooLong={showError}
                 onFocusConsumed={focusConsumed}
+                onToggleChecked={handleToggleChecked}
+                onToggleHasCheckbox={handleToggleHasCheckbox}
               />
             ))}
           </div>

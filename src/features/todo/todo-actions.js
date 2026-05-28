@@ -23,6 +23,25 @@ export function setLineText(lines, lineId, text) {
   return lines.map(l => (l.id === lineId ? { ...l, text } : l))
 }
 
+// ── Toggle checked on a line (only takes effect when hasCheckbox=true) ──
+export function toggleChecked(lines, lineId) {
+  return lines.map(l => {
+    if (l.id !== lineId) return l
+    if (!l.hasCheckbox) return l
+    return { ...l, checked: !l.checked }
+  })
+}
+
+// ── Toggle hasCheckbox on a line (Ctrl+1) ───────────────────────────────
+// When turning OFF, clear `checked` so a future re-enable starts unchecked.
+export function toggleHasCheckbox(lines, lineId) {
+  return lines.map(l => {
+    if (l.id !== lineId) return l
+    const next = !l.hasCheckbox
+    return { ...l, hasCheckbox: next, checked: next ? l.checked : false }
+  })
+}
+
 // ── Append a new empty line at end ──────────────────────────────────────
 export function appendLine(lines) {
   return [...lines, makeNewLine()]

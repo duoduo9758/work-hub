@@ -143,9 +143,10 @@ export default function TodoScreen() {
   }, [accessCode, selectedProjectId])
 
   // ── Editor change handler ───────────────────────────────────────────
-  const handleLinesChange = useCallback((next) => {
+  // opts.quick=true → checkbox toggles, save within 500ms (v2b)
+  const handleLinesChange = useCallback((next, opts) => {
     setLinesLocal(next)
-    markDirty()
+    markDirty(opts?.quick ? 500 : undefined)
   }, [markDirty])
 
   // ── Project switch (with force save of unsaved) ─────────────────────
