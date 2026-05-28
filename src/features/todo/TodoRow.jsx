@@ -43,9 +43,16 @@ export default function TodoRow({
   const [prevText, setPrevText] = useState(line.text)
 
   // ── Auto-resize ─────────────────────────────────────────────────────
+  // Skip when the textarea isn't in layout (parent display:none, e.g. the
+  // Todo tab is hidden behind Tracker). Otherwise scrollHeight reads 0 and
+  // we'd lock the row to height:0px, hiding the text after the user later
+  // switches to Todo. An IntersectionObserver below re-runs autoResize when
+  // the textarea becomes visible.
   function autoResize(el) {
     if (!el) return
+    if (el.offsetParent === null) return // hidden — leave CSS default
     el.style.height = 'auto'
+    if (el.scrollHeight === 0) return // belt-and-suspenders
     const maxHeight = LINE_HEIGHT_PX * MAX_VISIBLE_LINES + 10 // padding tolerance
     const newHeight = Math.min(el.scrollHeight, maxHeight)
     el.style.height = newHeight + 'px'
@@ -57,6 +64,20 @@ export default function TodoRow({
     autoResize(taRef.current)
     setPrevText(line.text)
   }, [line.text])
+
+  // Re-run autoResize when the textarea becomes visible (tab switch from
+  // Tracker to Todo, or any display:none → visible transition).
+  useEffect(() => {
+    const el = taRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some(en => en.isIntersecting)) {
+        autoResize(el)
+      }
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   // ── Focus request from parent (e.g. after split/merge) ──────────────
   useEffect(() => {
