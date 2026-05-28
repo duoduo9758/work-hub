@@ -12,6 +12,7 @@
 3. [v1: 土台＋日数トラッカー](#3-v1-土台日数トラッカー)
 4. [v2a: Todo 土台](#4-v2a-todo-土台)
 5. [v2b: Todo チェックボックス](#5-v2b-todo-チェックボックス)
+5b. [v2b-extra: Todo Undo / Redo](#5b-v2b-extra-todo-undo--redo)
 6. [v2c: Todo インデント](#6-v2c-todo-インデント)
 7. [v2d: Todo スマホ対応](#7-v2d-todo-スマホ対応)
 8. [v2e: Todo 保存堅牢化](#8-v2e-todo-保存堅牢化)
@@ -47,7 +48,7 @@
 
 | サブフェーズ | 推奨モデル / 工数 |
 |---|---|
-| v0 / v1 / v2a / v2b / v2c / v4 / v5 | Sonnet 4.6 / 中 |
+| v0 / v1 / v2a / v2b / v2b-extra / v2c / v4 / v5 | Sonnet 4.6 / 中 |
 | **v2d / v2e / v3** | **Opus 4.7 / 高**（複雑な実装） |
 | バグ調査（3回直して直らない時） | **Opus 4.7 / max** |
 
@@ -349,6 +350,41 @@ src/
 ### 5-5. リスクポイント
 
 - 500ms 保存と 1.5秒デバウンス保存が同時にトリガーされるケース：useDebounceSave で「最後の更新内容を1回保存」になるよう実装
+
+---
+
+## 5b. v2b-extra: Todo Undo / Redo
+
+### 5b-1. 目的
+行配列の構造変更（追加・削除・分割・結合・チェック・インデント）について、Ctrl+Z / Ctrl+Y / Cmd+Shift+Z で 1ステップ前後に戻れるようにする。1行内のテキスト編集は textarea ネイティブ undo に委譲。
+
+### 5b-2. ブランチ
+`feature/v2b-extra-undo`
+
+### 5b-3. 触るファイル（編集のみ）
+- `src/features/todo/useUndoRedo.js`（新規）— 履歴スタック管理フック
+- `src/features/todo/TodoEditor.jsx` — 構造変更ハンドラの先頭で snapshot push、キーボードハンドラ追加
+- `src/features/todo/TodoScreen.jsx` — プロジェクト切替・conflict reload 時の履歴クリア
+- `src/features/todo/TodoRow.jsx` — 必要なら Ctrl+Z/Y を textarea から bubble up させる
+- SPEC.md / CHARTER.md / BACKLOG.md / PLAN.md（本ファイル）— 仕様追記済み
+
+### 5b-4. 完了条件
+
+- [ ] Ctrl+Z で 1ステップ前の lines 状態に戻る
+- [ ] Ctrl+Y / Ctrl+Shift+Z で Redo
+- [ ] 履歴上限 50、超過で最古から捨てる
+- [ ] プロジェクト切替・conflict reload で履歴クリア
+- [ ] IME 変換中の Ctrl+Z / Y は無視
+- [ ] 履歴空の時の Ctrl+Z は preventDefault せず、textarea ネイティブ undo が動く
+- [ ] 新規構造変更で redo スタックがクリアされる
+- [ ] undo/redo後も markDirty でデバウンス保存される
+- [ ] v1 / v2a / v2b を壊していない
+
+### 5b-5. リスクポイント
+
+- textarea ネイティブ undo との競合：履歴が空かどうかで preventDefault を切り替える
+- conflict 状態での undo 暴発：`status === 'conflict'` の時は undo/redo を no-op に
+- 大量履歴によるメモリ：50件 × 1000行 × 〜500文字 ≈ 25MB の最悪値。許容範囲だが必要なら lines のシャローコピーで参照共有
 
 ---
 
@@ -793,7 +829,7 @@ CHARTER 通り：
 
 ## 14. 承認チェック
 
-- [ ] 実装順序 v0 → v1 → v2a → v2b → v2c → v2d → v2e → v3 → v4 → v5 に同意
+- [ ] 実装順序 v0 → v1 → v2a → v2b → v2b-extra → v2c → v2d → v2e → v3 → v4 → v5 に同意
 - [ ] 各サブフェーズで commit + 動作確認 + サブエージェント差分レビュー
 - [ ] ファイル構成（features / shared / lib / hooks / screens）に同意
 - [ ] 共通ライブラリの段階分け（v1 / v2a / v4）に同意
