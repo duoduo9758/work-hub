@@ -20,6 +20,60 @@
 .app-main {
   flex: 1;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ── Tab navigation ─────────────────────────────── */
+.app-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-lg);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.app-tabs__btn {
+  background: none;
+  border: none;
+  font-size: var(--text-base);
+  font-family: var(--font-family);
+  color: var(--color-text-muted);
+  padding: var(--space-md) var(--space-md);
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.app-tabs__btn:hover:not(:disabled) {
+  color: var(--color-text);
+}
+
+.app-tabs__btn--active {
+  color: var(--color-text);
+  font-weight: 600;
+  border-bottom-color: var(--color-primary-bg);
+}
+
+.app-tabs__btn--disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* ── Tab content panes ──────────────────────────── */
+.app-pane {
+  width: 100%;
+}
+.app-pane--flex {
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
 }
 
 /* ── Temp footer (logout only — replaced in v2+) ── */

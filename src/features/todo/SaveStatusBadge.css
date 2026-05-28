@@ -1,0 +1,50 @@
+.save-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--text-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.save-status-badge--dirty {
+  color: var(--color-text-muted);
+}
+
+.save-status-badge--saving {
+  color: var(--color-text-muted);
+}
+
+.save-status-badge--saved {
+  color: var(--color-text-muted);
+}
+
+.save-status-badge--failed {
+  color: var(--color-error);
+  background: #fef2f2;
+}
+
+.save-status-badge--conflict {
+  color: var(--color-error);
+  background: #fef2f2;
+  font-weight: 600;
+}
+
+.save-status-badge__retry {
+  background: none;
+  border: 1px solid currentColor;
+  color: inherit;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-family: var(--font-family);
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.save-status-badge__retry:hover {
+  background: rgba(239, 68, 68, 0.1);
+}

@@ -1,0 +1,74 @@
+.todo-screen {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  background: var(--color-bg);
+}
+
+.todo-screen__loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+}
+
+/* ── Main editor column ─────────────────────────────── */
+.todo-screen__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.todo-screen__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+  flex-shrink: 0;
+}
+
+.todo-screen__project-name {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.todo-screen__empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl) var(--space-lg);
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
+  text-align: center;
+}
+
+/* ── Mobile (375px range): stack sidebar on top ────── */
+@media (max-width: 639px) {
+  .todo-screen {
+    flex-direction: column;
+  }
+  .project-sidebar {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+}

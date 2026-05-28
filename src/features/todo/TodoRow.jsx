@@ -1,0 +1,195 @@
+import { useRef, useEffect, useState } from 'react'
+import { LINE_MAX_CHARS } from './todo-store'
+import './TodoRow.css'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TodoRow — single editable line in the Todo editor
+//
+// Auto-resize textarea (max 6 line-heights), IME-safe Enter/Backspace,
+// 500-char limit, multi-line paste delegated to parent.
+//
+// Props:
+//   line                 - { id, text, hasCheckbox, checked, indent }
+//   focusRequest         - { id, pos } | null  — parent requests focus at pos
+//   onChangeText(id, text)
+//   onSplit(id, cursorPos)       — Enter at cursorPos
+//   onMergeWithPrev(id)          — Backspace at position 0 (text may be empty or not)
+//   onDeleteLine(id)             — explicit delete button (PC only, hidden on mobile v2d)
+//   onMultilinePaste(id, cursorPos, pastedText) — pasted text contains \n
+//   onLineTooLong(reason)        — error display ("1行500文字以内で入力してください")
+//   onFocusConsumed()            — call after parent's focusRequest applied
+// ═══════════════════════════════════════════════════════════════════════════
+const MAX_VISIBLE_LINES = 6
+const LINE_HEIGHT_PX = 22 // matches CSS line-height
+
+export default function TodoRow({
+  line,
+  focusRequest,
+  onChangeText,
+  onSplit,
+  onMergeWithPrev,
+  onDeleteLine,
+  onMultilinePaste,
+  onLineTooLong,
+  onFocusConsumed,
+}) {
+  const taRef = useRef(null)
+  const isComposingRef = useRef(false)
+  // Track previous text so we can revert on too-long input (AC-TODO-L24)
+  const [prevText, setPrevText] = useState(line.text)
+
+  // ── Auto-resize ─────────────────────────────────────────────────────
+  function autoResize(el) {
+    if (!el) return
+    el.style.height = 'auto'
+    const maxHeight = LINE_HEIGHT_PX * MAX_VISIBLE_LINES + 10 // padding tolerance
+    const newHeight = Math.min(el.scrollHeight, maxHeight)
+    el.style.height = newHeight + 'px'
+    el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden'
+  }
+
+  // Resize on mount and whenever text changes
+  useEffect(() => {
+    autoResize(taRef.current)
+    setPrevText(line.text)
+  }, [line.text])
+
+  // ── Focus request from parent (e.g. after split/merge) ──────────────
+  useEffect(() => {
+    if (!focusRequest || focusRequest.id !== line.id) return
+    const el = taRef.current
+    if (!el) return
+    el.focus()
+    const pos = Math.max(0, Math.min(focusRequest.pos ?? 0, el.value.length))
+    // setSelectionRange must happen after focus
+    requestAnimationFrame(() => {
+      try {
+        el.setSelectionRange(pos, pos)
+      } catch {
+        /* some browsers throw if not yet focused */
+      }
+    })
+    onFocusConsumed?.()
+  }, [focusRequest, line.id, onFocusConsumed])
+
+  // ── Input handler with 500-char enforcement ─────────────────────────
+  function handleInput(e) {
+    const newText = e.target.value
+    if (newText.length > LINE_MAX_CHARS) {
+      // Revert and notify
+      e.target.value = prevText
+      onLineTooLong?.(`1行${LINE_MAX_CHARS}文字以内で入力してください`)
+      return
+    }
+    onChangeText(line.id, newText)
+    autoResize(e.target)
+  }
+
+  // ── Key handler: Enter / Backspace, IME-suppressed ──────────────────
+  function handleKeyDown(e) {
+    // IME composition: do nothing
+    if (isComposingRef.current || e.nativeEvent?.isComposing) return
+
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      const pos = e.target.selectionStart ?? line.text.length
+      onSplit(line.id, pos)
+      return
+    }
+
+    if (e.key === 'Backspace') {
+      const pos = e.target.selectionStart ?? 0
+      const selEnd = e.target.selectionEnd ?? 0
+      if (pos === 0 && selEnd === 0) {
+        // At line start → merge with previous (whether text is empty or not)
+        e.preventDefault()
+        onMergeWithPrev(line.id)
+      }
+      // else: default 1-char delete
+      return
+    }
+
+    // Tab / Shift+Tab → not implemented in v2a (v2c handles indent)
+    // Just let the browser handle (focus move). We could preventDefault
+    // to lock focus but spec says v2c will handle, so keep neutral.
+  }
+
+  // ── Paste handler: detect multi-line and delegate ───────────────────
+  function handlePaste(e) {
+    const text = e.clipboardData?.getData('text/plain') ?? ''
+    if (text.includes('\n') || text.includes('\r')) {
+      e.preventDefault()
+      const pos = e.target.selectionStart ?? line.text.length
+      try {
+        onMultilinePaste(line.id, pos, text)
+      } catch (err) {
+        if (err?.code === 'LINE_TOO_LONG') {
+          onLineTooLong?.(
+            `${err.lineIndex}行目が${LINE_MAX_CHARS}文字を超えています。ペーストを中止しました`
+          )
+        } else {
+          onLineTooLong?.('ペーストに失敗しました')
+        }
+      }
+      return
+    }
+    // Single-line paste: let default behavior run, but check length after
+    // (handleInput will catch and revert if needed)
+  }
+
+  // ── Composition (IME) handlers ──────────────────────────────────────
+  function handleCompositionStart() { isComposingRef.current = true }
+  function handleCompositionEnd(e) {
+    isComposingRef.current = false
+    // Trigger input handler to capture final composed text & length check
+    handleInput(e)
+  }
+
+  const isEmpty = line.text.length === 0
+
+  return (
+    <div
+      className="todo-row"
+      style={{ paddingLeft: `${line.indent * 24}px` }}
+    >
+      {/* Checkbox placeholder (toggle wiring is v2b) */}
+      {line.hasCheckbox && (
+        <span
+          className={
+            'todo-row__checkbox' +
+            (line.checked ? ' todo-row__checkbox--checked' : '')
+          }
+          aria-hidden="true"
+        />
+      )}
+
+      <textarea
+        ref={taRef}
+        className={
+          'todo-row__textarea' +
+          (line.checked && line.hasCheckbox ? ' todo-row__textarea--checked' : '')
+        }
+        value={line.text}
+        onChange={handleInput}
+        onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
+        onCompositionStart={handleCompositionStart}
+        onCompositionEnd={handleCompositionEnd}
+        rows={1}
+        spellCheck={false}
+        placeholder={isEmpty ? '...' : ''}
+        aria-label="行の内容"
+      />
+
+      <button
+        type="button"
+        className="todo-row__delete-btn"
+        onClick={() => onDeleteLine(line.id)}
+        aria-label="行を削除"
+        title="行を削除"
+      >
+        ×
+      </button>
+    </div>
+  )
+}

@@ -1,0 +1,72 @@
+.todo-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-lg);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.todo-editor--readonly .todo-row__textarea,
+.todo-editor--readonly .todo-row__delete-btn,
+.todo-editor--readonly .todo-editor__add-row-btn {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ── Transient error banner ──────────────────────────── */
+.todo-editor__error {
+  font-size: var(--text-sm);
+  color: var(--color-error);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+}
+
+/* ── Empty state ─────────────────────────────────────── */
+.todo-editor__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-2xl) var(--space-lg);
+  text-align: center;
+}
+
+.todo-editor__empty-text {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ── Row list ────────────────────────────────────────── */
+.todo-editor__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Add-row tertiary button (at end of non-empty list) ── */
+.todo-editor__add-row-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-align: left;
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-xs);
+  font-family: var(--font-family);
+  white-space: nowrap;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  align-self: flex-start;
+}
+
+.todo-editor__add-row-btn:hover {
+  color: var(--color-text);
+  background: var(--color-surface);
+}

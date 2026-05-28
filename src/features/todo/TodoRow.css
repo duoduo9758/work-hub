@@ -1,0 +1,100 @@
+.todo-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  transition: background-color 0.15s ease;
+}
+
+.todo-row:hover {
+  background: var(--color-surface);
+}
+
+/* ── Checkbox visual placeholder (v2b wires interaction) ── */
+.todo-row__checkbox {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-top: 4px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  background: var(--color-bg);
+}
+
+.todo-row__checkbox--checked {
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary-bg);
+  position: relative;
+}
+
+.todo-row__checkbox--checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--color-primary-fg);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* ── Textarea ──────────────────────────────────────────── */
+.todo-row__textarea {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-family);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: 22px;
+  padding: 2px 0;
+  resize: none;
+  overflow: hidden;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.todo-row__textarea:focus {
+  outline: none;
+}
+
+.todo-row__textarea--checked {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+.todo-row__textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+/* ── Delete button (PC only; mobile hides in v2d) ─────── */
+.todo-row__delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.todo-row:hover .todo-row__delete-btn,
+.todo-row:focus-within .todo-row__delete-btn {
+  opacity: 0.6;
+}
+
+.todo-row__delete-btn:hover {
+  opacity: 1 !important;
+  color: var(--color-error);
+  background: var(--color-secondary-bg);
+}
