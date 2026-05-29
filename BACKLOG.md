@@ -28,7 +28,8 @@ CHARTER.md / SPEC.md で確定したスコープ。詳細は SPEC.md 参照。
 - タイマー（カウントアップ + カウントダウン、ローカル完結）
 
 ### v5
-- UI 磨き込み（`frontend-design` 一括適用、テーマカラー確定）
+- UI 磨き込み（`frontend-design` 一括適用、モノクロ・ミニマル方針で磨き込み）
+- Firestore セキュリティルール本番化、GitHub Pages 公開、v1.0.0 タグ
 
 ---
 
