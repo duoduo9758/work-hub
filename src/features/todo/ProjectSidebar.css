@@ -10,6 +10,18 @@
   height: 100%;
   overflow-y: auto;
   box-sizing: border-box;
+  position: relative;
+}
+
+/* PC default: hide the mobile collapsed toggle */
+.project-sidebar__mobile-toggle {
+  display: none;
+}
+
+.project-sidebar__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
 
 .project-sidebar__header {
@@ -122,4 +134,94 @@
 
 .project-sidebar__icon-btn--danger:hover {
   color: var(--color-error);
+}
+
+/* ════════════════════════════════════════════════════
+   Mobile (≤ 639px): collapsed bar + dropdown panel
+   ════════════════════════════════════════════════════ */
+@media (max-width: 639px) {
+  .project-sidebar {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    padding: var(--space-sm) var(--space-md);
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    overflow: visible;
+    z-index: 10;
+  }
+
+  /* Show the toggle bar */
+  .project-sidebar__mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    width: 100%;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-family);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    cursor: pointer;
+    min-height: 44px;
+  }
+
+  .project-sidebar__mobile-toggle-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .project-sidebar__mobile-toggle-chevron {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+
+  /* Panel hidden by default on mobile, shown via floating dropdown */
+  .project-sidebar__panel {
+    display: none;
+  }
+
+  .project-sidebar--mobile-open .project-sidebar__panel {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-top: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: var(--space-md);
+    margin: 0 var(--space-md);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    z-index: 50;
+  }
+
+  /* Bigger touch targets in the dropdown list */
+  .project-sidebar__item {
+    padding: var(--space-sm);
+  }
+
+  /* Always show row-actions on mobile (no hover) */
+  .project-sidebar__row-actions {
+    opacity: 1;
+  }
+
+  /* Slightly larger icon buttons for touch */
+  .project-sidebar__icon-btn {
+    min-height: 32px;
+    padding: var(--space-xs) var(--space-sm);
+  }
 }

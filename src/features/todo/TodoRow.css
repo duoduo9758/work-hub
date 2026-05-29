@@ -110,3 +110,23 @@
   color: var(--color-error);
   background: var(--color-secondary-bg);
 }
+
+/* ── Mobile (≤ 639px): hide delete button (AC-TODO-M06).
+   Delete on mobile happens by long-pressing or via PC. ─────────────── */
+@media (max-width: 639px) {
+  .todo-row__delete-btn {
+    display: none;
+  }
+  /* Bigger touch target for checkbox (AC-TODO-M02) */
+  .todo-row__checkbox {
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+  }
+  .todo-row__checkbox--checked::after {
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+  }
+}
