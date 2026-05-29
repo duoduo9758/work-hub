@@ -28,11 +28,17 @@ function AppInner() {
   const [trackers, setTrackers] = useState([])
   const [currentTab, setCurrentTab] = useState('tracker')
 
-  // Tab-switch scroll behavior: reset .app-main to top, EXCEPT for Todo
+  // Tab-switch scroll behavior: reset to top, EXCEPT for Todo
   // (Todo preserves its editor scroll position, OneNote-style).
+  // Reset multiple targets because mobile Safari/Chrome may scroll body
+  // or documentElement instead of .app-main depending on layout collapse.
   useEffect(() => {
     if (currentTab === 'todo') return
-    document.querySelector('.app-main')?.scrollTo({ top: 0, behavior: 'instant' })
+    const am = document.querySelector('.app-main')
+    if (am) am.scrollTop = 0
+    window.scrollTo(0, 0)
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
   }, [currentTab])
 
   const handleTrackersChange = useCallback((updatedTrackers) => {
