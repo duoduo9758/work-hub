@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { AuthProvider, useAuth } from './shared/contexts/AuthContext'
 import { MetaProvider } from './shared/contexts/MetaContext'
 import { UnsavedChangesProvider, useUnsavedChanges } from './shared/contexts/UnsavedChangesContext'
@@ -27,6 +27,13 @@ function AppInner() {
   const { ensureSaved } = useUnsavedChanges()
   const [trackers, setTrackers] = useState([])
   const [currentTab, setCurrentTab] = useState('tracker')
+
+  // Tab-switch scroll behavior: reset .app-main to top, EXCEPT for Todo
+  // (Todo preserves its editor scroll position, OneNote-style).
+  useEffect(() => {
+    if (currentTab === 'todo') return
+    document.querySelector('.app-main')?.scrollTo({ top: 0, behavior: 'instant' })
+  }, [currentTab])
 
   const handleTrackersChange = useCallback((updatedTrackers) => {
     setTrackers(updatedTrackers)

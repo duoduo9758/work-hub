@@ -151,6 +151,10 @@
     border-bottom: 1px solid var(--color-border);
     overflow: visible;
     z-index: 10;
+    /* Keep the project selector pinned at the top while editor content scrolls */
+    position: sticky;
+    top: 0;
+    background: var(--color-bg);
   }
 
   /* Show the toggle bar */
