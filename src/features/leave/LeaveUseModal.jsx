@@ -43,7 +43,7 @@ export default function LeaveUseModal({ mode, record, onSave, onClose }) {
       days: Number(days),
       hours: Number(hours),
       date,
-      note: note?.trim() || null,
+      note: note?.trim() || '',
     })
     if (!ok) setSaving(false)
     // If saved, the parent closes the modal.

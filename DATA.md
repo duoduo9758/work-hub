@@ -856,6 +856,12 @@ service cloud.firestore {
 
 Firebase Auth を使わないため本人保護はできないが、**破壊・汚染・無料枠消費リスクは Rules で最大限縮小する**。
 
+> **v5-b 実装注意（重要）：**
+> - 各コレクションには `allow delete: if validAccessCode(accessCode)` を **必ず別ルールとして追加**。`allow write` は構造検証（`request.resource.data`）を含むため delete 時に false 評価され、delete がブロックされる。
+> - `leaveRecords.note` は **空文字 `''`** で書く（`null` は拒否される。`request.resource.data.note is string`）。
+> - `leaveRecords` で use→adjustment へ編集切替する際、`days` フィールドは `null` ではなく **`deleteField()` で完全削除**（Rules の `hasOnly` が adjustment 時に `days` を許可しない）。
+> - 実際の本番 Rules は `firestore.rules`（リポジトリルート）を参照。Firebase Console 適用時はそのファイルの内容を貼り付ける。
+
 ```
 rules_version = '2';
 service cloud.firestore {

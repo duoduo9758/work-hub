@@ -62,7 +62,7 @@ export default function LeaveAdjustModal({ mode, record, onSave, onClose }) {
       leaveType,
       hours: signedHours,
       date,
-      note: note?.trim() || null,
+      note: note?.trim() || '',
     })
     if (!ok) setSaving(false)
   }

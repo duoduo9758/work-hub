@@ -1,6 +1,6 @@
 import {
   collection, doc, query, where, getDocs,
-  runTransaction, setDoc, serverTimestamp, increment,
+  runTransaction, setDoc, serverTimestamp, increment, deleteField,
 } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 import { safeGetItem } from '../../lib/storage'
@@ -83,7 +83,7 @@ export async function addLeaveRecord(accessCode, record) {
     ...(record.type === 'use' ? { days: Number(record.days ?? 0) } : {}),
     hours: Number(record.hours ?? 0),
     date: record.date,
-    note: record.note ?? null,
+    note: record.note ?? '',
     version: 1,
     updatedByClientId: clientId,
     createdAt: serverTimestamp(),
@@ -128,7 +128,7 @@ export async function editLeaveRecord(accessCode, recordId, baseVersion, newData
       leaveType: newData.leaveType,
       hours: Number(newData.hours ?? 0),
       date: newData.date,
-      note: newData.note ?? null,
+      note: newData.note ?? '',
       version: increment(1),
       updatedByClientId: clientId,
       updatedAt: serverTimestamp(),
@@ -136,12 +136,18 @@ export async function editLeaveRecord(accessCode, recordId, baseVersion, newData
     if (newData.type === 'use') {
       update.days = Number(newData.days ?? 0)
     } else if (current.type === 'use') {
-      // Switched from use to adjustment — clear stale days
-      update.days = null
+      // Switched from use to adjustment — remove the days field entirely
+      // (Rules' hasOnly for adjustment forbids 'days' even if value is null)
+      update.days = deleteField()
     }
     tx.update(ref, update)
 
-    return { ...current, ...update, version: (current.version ?? 1) + 1 }
+    const returned = { ...current, ...update, version: (current.version ?? 1) + 1 }
+    // Strip the deleteField sentinel from local state when switching use→adjustment.
+    if (newData.type === 'adjustment' && current.type === 'use') {
+      delete returned.days
+    }
+    return returned
   })
 }
 

@@ -1,0 +1,103 @@
+rules_version = '2';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// work-hub Firestore Security Rules — production (v0.3 強化版)
+// Source of truth: DATA.md §9-2.
+// Apply via Firebase Console → Firestore → Rules → paste & publish.
+// Firebase Auth は使わないため本人保護は不可。CHARTER 6 章受容済み。
+// Rules で破壊・汚染・無料枠消費リスクを最大限縮小する。
+// ═══════════════════════════════════════════════════════════════════════════
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // アクセスコードの形式検証（8〜64文字、英数字/_/-）
+    function validAccessCode(code) {
+      return code is string
+        && code.size() >= 8
+        && code.size() <= 64
+        && code.matches('^[A-Za-z0-9_-]+$');
+    }
+
+    // meta/singleton
+    match /users/{accessCode}/meta/singleton {
+      allow read: if validAccessCode(accessCode);
+      allow write: if validAccessCode(accessCode)
+        && request.resource.data.keys().hasOnly([
+          'createdAt', 'lastLoginAt', 'pinnedTrackerId', 'schemaVersion'
+        ]);
+    }
+
+    // trackers/{trackerId}
+    match /users/{accessCode}/trackers/{trackerId} {
+      allow read: if validAccessCode(accessCode);
+      allow write: if validAccessCode(accessCode)
+        && request.resource.data.keys().hasOnly([
+          'id', 'title', 'startDate', 'endDate', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 30;
+      allow delete: if validAccessCode(accessCode);
+    }
+
+    // todoProjects/{projectId}
+    match /users/{accessCode}/todoProjects/{projectId} {
+      allow read: if validAccessCode(accessCode);
+      allow write: if validAccessCode(accessCode)
+        && request.resource.data.keys().hasOnly([
+          'id', 'name', 'lines', 'version', 'updatedByClientId',
+          'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 30
+        && request.resource.data.lines is list
+        && request.resource.data.lines.size() <= 1000;
+      allow delete: if validAccessCode(accessCode);
+    }
+
+    // leaveRecords/{recordId}
+    // v0.6：use と adjustment で discriminated union、共通検証 + 個別検証
+    match /users/{accessCode}/leaveRecords/{recordId} {
+      allow read: if validAccessCode(accessCode);
+      allow write: if validAccessCode(accessCode)
+        // 共通検証（両 type 共通）
+        && request.resource.data.leaveType in ['paid', 'sick']
+        && request.resource.data.id == recordId
+        && request.resource.data.note is string
+        && request.resource.data.note.size() <= 30
+        && request.resource.data.date is string
+        && request.resource.data.date.matches('^\\d{4}-\\d{2}-\\d{2}$')
+        // type 別のキー検証
+        && (
+          (request.resource.data.type == 'use'
+            && request.resource.data.keys().hasOnly([
+              'id', 'type', 'leaveType', 'days', 'hours', 'date', 'note',
+              'version', 'updatedByClientId', 'createdAt', 'updatedAt'
+            ])
+            && request.resource.data.days is int
+            && request.resource.data.days >= 0
+            && request.resource.data.days <= 365
+            && request.resource.data.hours is int
+            && request.resource.data.hours >= 0
+            && request.resource.data.hours <= 7
+            && (request.resource.data.days > 0 || request.resource.data.hours > 0))
+          ||
+          (request.resource.data.type == 'adjustment'
+            && request.resource.data.keys().hasOnly([
+              'id', 'type', 'leaveType', 'hours', 'date', 'note',
+              'version', 'updatedByClientId', 'createdAt', 'updatedAt'
+            ])
+            && request.resource.data.hours is int
+            && request.resource.data.hours >= -9999
+            && request.resource.data.hours <= 9999
+            && request.resource.data.hours != 0)
+        );
+      allow delete: if validAccessCode(accessCode);
+    }
+
+    // それ以外のパスは完全拒否
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
