@@ -21,10 +21,16 @@
   flex-shrink: 0;
 }
 
+@media (min-width: 640px) {
+  .leave-screen__actions {
+    justify-content: flex-end;
+    padding: var(--space-md) var(--space-lg);
+  }
+}
+
 @media (max-width: 639px) {
   .leave-screen__actions {
-    padding: var(--space-sm);
-    justify-content: stretch;
+    padding: var(--space-sm) var(--space-lg);
   }
   .leave-screen__actions > * {
     flex: 1;

@@ -81,9 +81,19 @@ export default function LeaveHistoryTabs({
       </div>
 
       {filtered.length === 0 ? (
-        <p className="leave-history__empty">
-          {currentTab === 'use' ? '利用履歴がありません' : '調整履歴がありません'}
-        </p>
+        <div className="leave-history__empty">
+          <div className="leave-history__empty-card">
+            <span className="leave-history__empty-rule" aria-hidden="true" />
+            <p className="leave-history__empty-title">
+              {currentTab === 'use' ? 'まだ利用履歴がありません' : 'まだ調整履歴がありません'}
+            </p>
+            <p className="leave-history__empty-hint">
+              {currentTab === 'use'
+                ? '上部の「+ 取得」から最初の記録を追加できます'
+                : '上部の「+ 調整」から年度付与や繰越を記録できます'}
+            </p>
+          </div>
+        </div>
       ) : (
         <ul className="leave-history__list">
           {filtered.map(r => (
