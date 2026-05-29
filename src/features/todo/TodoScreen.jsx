@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../../shared/contexts/AuthContext'
+import { useUnsavedChanges } from '../../shared/contexts/UnsavedChangesContext'
 import { useDebounceSave } from '../../hooks/useDebounceSave'
 import {
   loadProjects, loadProject, createProject, updateProjectName,
@@ -23,6 +24,7 @@ import './TodoScreen.css'
 // ═══════════════════════════════════════════════════════════════════════════
 export default function TodoScreen() {
   const { accessCode } = useAuth()
+  const { register: registerUnsavedGuard } = useUnsavedChanges()
 
   const [projects, setProjects] = useState([])
   const [selectedProjectId, setSelectedProjectId] = useState(null)
@@ -91,6 +93,23 @@ export default function TodoScreen() {
   useEffect(() => {
     if (saveStatus === 'conflict') setShowConflict(true)
   }, [saveStatus])
+
+  // ── Register unsaved-changes guard (AC-TODO-S09 + logout warn) ─────
+  // Tab switch and logout will call guard.hasUnsaved() → guard.forceSave()
+  // before discarding work. Conflict state is treated as "not auto-savable"
+  // and reports hasUnsaved=false so navigation isn't blocked by it (the
+  // conflict modal already has its own resolution flow).
+  const saveStatusRef = useRef(saveStatus)
+  useEffect(() => { saveStatusRef.current = saveStatus }, [saveStatus])
+  useEffect(() => {
+    return registerUnsavedGuard({
+      hasUnsaved: () => {
+        const s = saveStatusRef.current
+        return s === 'dirty' || s === 'failed'
+      },
+      forceSave: () => forceSave(),
+    })
+  }, [registerUnsavedGuard, forceSave])
 
   // ── Load project list on mount ──────────────────────────────────────
   const fetchProjects = useCallback(async () => {

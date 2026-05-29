@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { AuthProvider, useAuth } from './shared/contexts/AuthContext'
 import { MetaProvider } from './shared/contexts/MetaContext'
+import { UnsavedChangesProvider, useUnsavedChanges } from './shared/contexts/UnsavedChangesContext'
 import LoginScreen from './screens/LoginScreen'
 import HeaderBar from './screens/HeaderBar'
 import TrackerList from './features/tracker/TrackerList'
@@ -21,12 +22,28 @@ const TABS = [
 // ═══════════════════════════════════════════════════════════════════════════
 function AppInner() {
   const { isInitializing, isLoggedIn, accessCode, initialPinnedId, logout } = useAuth()
+  const { ensureSaved } = useUnsavedChanges()
   const [trackers, setTrackers] = useState([])
   const [currentTab, setCurrentTab] = useState('tracker')
 
   const handleTrackersChange = useCallback((updatedTrackers) => {
     setTrackers(updatedTrackers)
   }, [])
+
+  // Tab change with unsaved-changes guard (AC-TODO-S09).
+  const handleTabClick = useCallback(async (tabId) => {
+    if (tabId === currentTab) return
+    const ok = await ensureSaved()
+    if (!ok) return
+    setCurrentTab(tabId)
+  }, [currentTab, ensureSaved])
+
+  // Logout with unsaved-changes guard.
+  const handleLogout = useCallback(async () => {
+    const ok = await ensureSaved()
+    if (!ok) return
+    logout()
+  }, [ensureSaved, logout])
 
   if (isInitializing) {
     return (
@@ -58,7 +75,7 @@ function AppInner() {
                 (currentTab === tab.id ? ' app-tabs__btn--active' : '') +
                 (!tab.enabled ? ' app-tabs__btn--disabled' : '')
               }
-              onClick={() => tab.enabled && setCurrentTab(tab.id)}
+              onClick={() => tab.enabled && handleTabClick(tab.id)}
               title={tab.enabled ? tab.label : `${tab.label}（近日公開）`}
             >
               {tab.label}
@@ -86,7 +103,7 @@ function AppInner() {
         </main>
 
         <footer className="app-footer">
-          <button className="app-footer__logout" onClick={logout}>
+          <button className="app-footer__logout" onClick={handleLogout}>
             ログアウト
           </button>
         </footer>
@@ -101,7 +118,9 @@ function AppInner() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppInner />
+      <UnsavedChangesProvider>
+        <AppInner />
+      </UnsavedChangesProvider>
     </AuthProvider>
   )
 }
