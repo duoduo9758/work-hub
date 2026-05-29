@@ -237,6 +237,18 @@ export default function TodoRow({
       >
         ×
       </button>
+
+      {/* Mobile-only checkbox-toggle button: replaces Ctrl+1 which mobile
+          doesn't have. Shown only ≤639px via CSS. (AC-TODO-M03) */}
+      <button
+        type="button"
+        className="todo-row__chk-toggle-btn"
+        onClick={() => onToggleHasCheckbox?.(line.id)}
+        aria-label={line.hasCheckbox ? 'チェックボックスを外す' : 'チェックボックスを付ける'}
+        title={line.hasCheckbox ? 'チェックボックスを外す' : 'チェックボックスを付ける'}
+      >
+        {line.hasCheckbox ? '☑' : '☐'}
+      </button>
     </div>
   )
 }

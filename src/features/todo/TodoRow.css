@@ -111,11 +111,38 @@
   background: var(--color-secondary-bg);
 }
 
-/* ── Mobile (≤ 639px): hide delete button (AC-TODO-M06).
-   Delete on mobile happens by long-pressing or via PC. ─────────────── */
+/* ── Mobile-only "+checkbox" toggle button (replaces PC's Ctrl+1).
+   Hidden on PC, shown ≤639px (AC-TODO-M03). ──────────────────────── */
+.todo-row__chk-toggle-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  min-height: 32px;
+  min-width: 32px;
+}
+
+.todo-row__chk-toggle-btn:hover {
+  color: var(--color-text);
+  background: var(--color-secondary-bg);
+}
+
+/* ── Mobile (≤ 639px): hide delete button (AC-TODO-M06),
+   show +checkbox toggle, enlarge checkbox. ─────────────────────── */
 @media (max-width: 639px) {
   .todo-row__delete-btn {
     display: none;
+  }
+  .todo-row__chk-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
   /* Bigger touch target for checkbox (AC-TODO-M02) */
   .todo-row__checkbox {
