@@ -20,6 +20,8 @@ import './TodoRow.css'
 //   onFocusConsumed()            — call after parent's focusRequest applied
 //   onToggleChecked(id)          — checkbox click (v2b)
 //   onToggleHasCheckbox(id)      — Ctrl+1 / Cmd+1 (v2b)
+//   onIncreaseIndent(id)         — Tab (v2c)
+//   onDecreaseIndent(id)         — Shift+Tab (v2c)
 // ═══════════════════════════════════════════════════════════════════════════
 const MAX_VISIBLE_LINES = 6
 const LINE_HEIGHT_PX = 22 // matches CSS line-height
@@ -36,6 +38,8 @@ export default function TodoRow({
   onFocusConsumed,
   onToggleChecked,
   onToggleHasCheckbox,
+  onIncreaseIndent,
+  onDecreaseIndent,
 }) {
   const taRef = useRef(null)
   const isComposingRef = useRef(false)
@@ -141,9 +145,17 @@ export default function TodoRow({
       return
     }
 
-    // Tab / Shift+Tab → not implemented in v2a (v2c handles indent)
-    // Just let the browser handle (focus move). We could preventDefault
-    // to lock focus but spec says v2c will handle, so keep neutral.
+    // Tab / Shift+Tab → indent ± (AC-TODO-L08 / L09 / L19 / L20, v2c).
+    // IME check above already exits, so AC-L17 (IME中のTab無視) holds.
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      if (e.shiftKey) {
+        onDecreaseIndent?.(line.id)
+      } else {
+        onIncreaseIndent?.(line.id)
+      }
+      return
+    }
   }
 
   // ── Paste handler: detect multi-line and delegate ───────────────────

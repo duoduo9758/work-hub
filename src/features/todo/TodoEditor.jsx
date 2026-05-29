@@ -11,6 +11,9 @@ import {
   makeNewLine,
   toggleChecked,
   toggleHasCheckbox,
+  increaseIndent,
+  decreaseIndent,
+  INDENT_MAX,
 } from './todo-actions'
 import { LINE_MAX_PER_PROJECT } from './todo-store'
 import { useUndoRedo } from './useUndoRedo'
@@ -117,6 +120,21 @@ export default function TodoEditor({ lines, onLinesChange, readonly = false }) {
     onLinesChange(toggleHasCheckbox(lines, id), { quick: true })
   }, [lines, onLinesChange, push])
 
+  // ── Indent (v2c) — Tab / Shift+Tab. No-op at bounds (no history push).
+  const handleIncreaseIndent = useCallback((id) => {
+    const line = lines.find(l => l.id === id)
+    if (!line || line.indent >= INDENT_MAX) return // AC-TODO-L19
+    push(lines)
+    onLinesChange(increaseIndent(lines, id))
+  }, [lines, onLinesChange, push])
+
+  const handleDecreaseIndent = useCallback((id) => {
+    const line = lines.find(l => l.id === id)
+    if (!line || line.indent <= 0) return // AC-TODO-L20
+    push(lines)
+    onLinesChange(decreaseIndent(lines, id))
+  }, [lines, onLinesChange, push])
+
   const focusConsumed = useCallback(() => setFocusRequest(null), [])
 
   // ── Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z handler (AC-TODO-L22 / L29-L34) ───
@@ -199,6 +217,8 @@ export default function TodoEditor({ lines, onLinesChange, readonly = false }) {
                 onFocusConsumed={focusConsumed}
                 onToggleChecked={handleToggleChecked}
                 onToggleHasCheckbox={handleToggleHasCheckbox}
+                onIncreaseIndent={handleIncreaseIndent}
+                onDecreaseIndent={handleDecreaseIndent}
               />
             ))}
           </div>

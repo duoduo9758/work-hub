@@ -7,6 +7,9 @@ import { LINE_MAX_CHARS } from './todo-store'
 // All functions are immutable: return new arrays, never mutate input.
 // ═══════════════════════════════════════════════════════════════════════════
 
+// Max visual indent level (v2c). Visual only — no parent/child data relation.
+export const INDENT_MAX = 5
+
 export function makeNewLine(overrides = {}) {
   return {
     id: uuid(),
@@ -29,6 +32,25 @@ export function toggleChecked(lines, lineId) {
     if (l.id !== lineId) return l
     if (!l.hasCheckbox) return l
     return { ...l, checked: !l.checked }
+  })
+}
+
+// ── Indent +1 (Tab, AC-TODO-L08 / L19, max INDENT_MAX) ──────────────────
+// No-op when already at max (caller can check first to avoid history push)
+export function increaseIndent(lines, lineId) {
+  return lines.map(l => {
+    if (l.id !== lineId) return l
+    if (l.indent >= INDENT_MAX) return l
+    return { ...l, indent: l.indent + 1 }
+  })
+}
+
+// ── Indent -1 (Shift+Tab, AC-TODO-L09 / L20, min 0) ─────────────────────
+export function decreaseIndent(lines, lineId) {
+  return lines.map(l => {
+    if (l.id !== lineId) return l
+    if (l.indent <= 0) return l
+    return { ...l, indent: l.indent - 1 }
   })
 }
 
