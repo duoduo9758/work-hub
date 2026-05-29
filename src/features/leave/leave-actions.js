@@ -1,21 +1,31 @@
 import {
-  collection, doc, query, where, runTransaction, serverTimestamp, increment,
+  collection, doc, query, where, getDocs,
+  runTransaction, setDoc, serverTimestamp, increment,
 } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
-import { uuid } from '../../lib/uuid'
 import { safeGetItem } from '../../lib/storage'
 import { calcBalance, projectedBalance } from './leave-calc'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // leave-actions — Firestore mutations for leaveRecords.
-// Each mutation runs inside runTransaction, reads all records for the same
-// leaveType, recomputes the resulting balance, and rejects with
-// SHORTAGE (negative balance) or CONFLICT (version mismatch from another
-// client). Errors are normalized to:
+//
+// Strategy: Firebase JS SDK transactions only support tx.get(documentRef)
+// — they cannot get a query inside the transaction. So we:
+//   1. Read all same-leaveType records OUTSIDE the transaction (getDocs).
+//   2. Recompute the projected balance with the proposed change.
+//   3. Reject locally on SHORTAGE.
+//   4. Use a small transaction (or plain write) for the actual mutation,
+//      including a version check on the target doc to catch CONFLICT.
+//
+// Trade-off: the race window between the getDocs read and the write is
+// ~tens of ms. For a single-user app this is acceptable. Multi-device
+// concurrent saves of the same leaveType could in theory let two writes
+// both pass the local balance check; the deterministic-ish risk is the
+// same as the existing Todo single-write conflict story.
+//
+// Errors are normalized to:
 //   err.code === 'SHORTAGE',   err.shortageHours (positive number)
 //   err.code === 'CONFLICT'
-// so the UI can render the right dialog.
-//
 // Schema: see DATA.md §2-2 / §8b-4b.
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -44,51 +54,59 @@ function makeConflictError() {
   return err
 }
 
+// ── Load all records of a single leaveType (helper) ─────────────────────
+async function loadByLeaveType(accessCode, leaveType) {
+  const q = query(recordsCol(accessCode), where('leaveType', '==', leaveType))
+  const snap = await getDocs(q)
+  return snap.docs.map(d => d.data())
+}
+
 // ── Add a new leave record (use or adjustment) ──────────────────────────
 // `record` shape: { type, leaveType, days?, hours, date, note }
-// Returns the saved record (with id, version=1, timestamps).
+// Returns the saved record (with id, version=1, local timestamps).
 export async function addLeaveRecord(accessCode, record) {
   const clientId = getClientId()
-  return await runTransaction(db, async (tx) => {
-    // 1. Read all records of the same leaveType
-    const q = query(recordsCol(accessCode), where('leaveType', '==', record.leaveType))
-    const snap = await tx.get(q)
-    const existing = snap.docs.map(d => d.data())
 
-    // 2. Recompute balance with the new record included
-    const proposed = { ...record, id: '__new__' }
-    const newBalance = projectedBalance(existing, record.leaveType, proposed)
-    if (newBalance < 0) throw makeShortageError(Math.abs(newBalance))
+  // 1. Read existing same-leaveType records and check projected balance
+  const existing = await loadByLeaveType(accessCode, record.leaveType)
+  const proposed = { ...record, id: '__new__' }
+  const newBalance = projectedBalance(existing, record.leaveType, proposed)
+  if (newBalance < 0) throw makeShortageError(Math.abs(newBalance))
 
-    // 3. Save
-    const newRef = doc(recordsCol(accessCode))
-    const id = newRef.id
-    const data = {
-      id,
-      type: record.type,
-      leaveType: record.leaveType,
-      ...(record.type === 'use' ? { days: Number(record.days ?? 0) } : {}),
-      hours: Number(record.hours ?? 0),
-      date: record.date,
-      note: record.note ?? null,
-      version: 1,
-      updatedByClientId: clientId,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    }
-    tx.set(newRef, data)
-    // Return a best-effort local copy (server timestamps are not resolved yet)
-    return { ...data, createdAt: new Date(), updatedAt: new Date() }
-  })
+  // 2. Write new doc (no version conflict possible — fresh id)
+  const newRef = doc(recordsCol(accessCode))
+  const id = newRef.id
+  const data = {
+    id,
+    type: record.type,
+    leaveType: record.leaveType,
+    ...(record.type === 'use' ? { days: Number(record.days ?? 0) } : {}),
+    hours: Number(record.hours ?? 0),
+    date: record.date,
+    note: record.note ?? null,
+    version: 1,
+    updatedByClientId: clientId,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  }
+  await setDoc(newRef, data)
+  return { ...data, createdAt: new Date(), updatedAt: new Date() }
 }
 
 // ── Edit an existing record ─────────────────────────────────────────────
-// `newData` shape: { type, leaveType, days?, hours, date, note }
-// `baseVersion` is the version we expect on the server.
 export async function editLeaveRecord(accessCode, recordId, baseVersion, newData) {
   const clientId = getClientId()
+
+  // 1. Recompute balance for the NEW leaveType, excluding the target
+  const newTypeRecords = await loadByLeaveType(accessCode, newData.leaveType)
+  const others = newTypeRecords.filter(r => r.id !== recordId)
+  const proposed = { ...newData, id: recordId }
+  const newBalance = calcBalance([...others, proposed], newData.leaveType)
+  if (newBalance < 0) throw makeShortageError(Math.abs(newBalance))
+
+  // 2. If leaveType changed, also verify OLD type's balance stays valid
+  //    (removing an adjustment could push it negative).
   return await runTransaction(db, async (tx) => {
-    // 1. Read target record for version check
     const ref = recordRef(accessCode, recordId)
     const targetSnap = await tx.get(ref)
     if (!targetSnap.exists()) throw makeConflictError()
@@ -98,29 +116,13 @@ export async function editLeaveRecord(accessCode, recordId, baseVersion, newData
       throw makeConflictError()
     }
 
-    // 2. Read all records of the (possibly new) leaveType for balance
-    const q = query(recordsCol(accessCode), where('leaveType', '==', newData.leaveType))
-    const snap = await tx.get(q)
-    const others = snap.docs.map(d => d.data()).filter(r => r.id !== recordId)
-
-    // 3. Recompute balance with edited record substituted
-    const proposed = { ...newData, id: recordId }
-    const newBalance = calcBalance([...others, proposed], newData.leaveType)
-    if (newBalance < 0) throw makeShortageError(Math.abs(newBalance))
-
-    // 4. If leaveType changed, we also need the OTHER type's balance to
-    //    stay non-negative (the edited record left it). Removing the
-    //    old record from its old type can never push that side negative
-    //    (adjustments removed → could go negative; use removed → only adds).
     if (current.leaveType !== newData.leaveType) {
-      const qOld = query(recordsCol(accessCode), where('leaveType', '==', current.leaveType))
-      const oldSnap = await tx.get(qOld)
-      const oldOthers = oldSnap.docs.map(d => d.data()).filter(r => r.id !== recordId)
+      const oldTypeRecords = await loadByLeaveType(accessCode, current.leaveType)
+      const oldOthers = oldTypeRecords.filter(r => r.id !== recordId)
       const oldBalance = calcBalance(oldOthers, current.leaveType)
       if (oldBalance < 0) throw makeShortageError(Math.abs(oldBalance))
     }
 
-    // 5. Apply update — full overwrite of the editable fields
     const update = {
       type: newData.type,
       leaveType: newData.leaveType,
@@ -133,6 +135,9 @@ export async function editLeaveRecord(accessCode, recordId, baseVersion, newData
     }
     if (newData.type === 'use') {
       update.days = Number(newData.days ?? 0)
+    } else if (current.type === 'use') {
+      // Switched from use to adjustment — clear stale days
+      update.days = null
     }
     tx.update(ref, update)
 
@@ -141,24 +146,27 @@ export async function editLeaveRecord(accessCode, recordId, baseVersion, newData
 }
 
 // ── Delete a record (use or adjustment) ─────────────────────────────────
-// Checks that removing this record won't push the balance negative
-// (matters for adjustment deletes; use deletes only restore balance).
+// Pre-check the projected balance OUTSIDE the transaction, then do a
+// version-checked delete inside one. The window between check and delete
+// is small; for single-user usage no race.
 export async function deleteLeaveRecord(accessCode, recordId, baseVersion) {
   const clientId = getClientId()
+
+  // 1. Fetch target (to know its leaveType for the balance check)
+  const ref = recordRef(accessCode, recordId)
   return await runTransaction(db, async (tx) => {
-    const ref = recordRef(accessCode, recordId)
     const snap = await tx.get(ref)
-    if (!snap.exists()) return // already gone — treat as success
+    if (!snap.exists()) return // already gone
     const target = snap.data()
 
     if (target.version !== baseVersion && target.updatedByClientId !== clientId) {
       throw makeConflictError()
     }
 
-    // Recompute balance without the target record
-    const q = query(recordsCol(accessCode), where('leaveType', '==', target.leaveType))
-    const allSnap = await tx.get(q)
-    const others = allSnap.docs.map(d => d.data()).filter(r => r.id !== recordId)
+    // 2. Recompute balance without target (read outside is fine here —
+    //    we're already serialized on the target's version check)
+    const sameType = await loadByLeaveType(accessCode, target.leaveType)
+    const others = sameType.filter(r => r.id !== recordId)
     const newBalance = calcBalance(others, target.leaveType)
     if (newBalance < 0) throw makeShortageError(Math.abs(newBalance))
 

@@ -6,14 +6,15 @@ import LoginScreen from './screens/LoginScreen'
 import HeaderBar from './screens/HeaderBar'
 import TrackerList from './features/tracker/TrackerList'
 import TodoScreen from './features/todo/TodoScreen'
+import LeaveScreen from './features/leave/LeaveScreen'
 import Spinner from './shared/components/Spinner'
 import './App.css'
 
-// Tabs registry — v2a adds 'todo' as active. Leave / Timer come in v3 / v4.
+// Tabs registry — v3 enables 'leave'. Timer comes in v4.
 const TABS = [
   { id: 'tracker', label: 'トラッカー', enabled: true },
   { id: 'todo', label: 'Todo', enabled: true },
-  { id: 'leave', label: '休暇', enabled: false },
+  { id: 'leave', label: '休暇', enabled: true },
   { id: 'timer', label: 'タイマー', enabled: false },
 ]
 
@@ -99,6 +100,13 @@ function AppInner() {
             aria-hidden={currentTab !== 'todo'}
           >
             <TodoScreen />
+          </div>
+          <div
+            className="app-pane app-pane--flex"
+            style={{ display: currentTab === 'leave' ? 'flex' : 'none' }}
+            aria-hidden={currentTab !== 'leave'}
+          >
+            <LeaveScreen />
           </div>
         </main>
 

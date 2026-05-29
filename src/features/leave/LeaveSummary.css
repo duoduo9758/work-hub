@@ -1,0 +1,83 @@
+.leave-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.leave-summary__block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.leave-summary__title {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.leave-summary__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: 2px 0;
+}
+
+.leave-summary__label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.leave-summary__value {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.leave-summary__value--primary {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.leave-summary__note {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-left: var(--space-xs);
+}
+
+/* 5-day rule states */
+.leave-summary__row--warn {
+  color: var(--color-warning, #b45309);
+}
+.leave-summary__row--warn .leave-summary__label,
+.leave-summary__row--warn .leave-summary__value,
+.leave-summary__row--warn .leave-summary__note {
+  color: inherit;
+}
+
+.leave-summary__row--ok {
+  color: var(--color-text);
+}
+
+.leave-summary__hint {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+}
+
+.leave-summary__footnote {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
