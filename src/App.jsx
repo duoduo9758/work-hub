@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { AuthProvider, useAuth } from './shared/contexts/AuthContext'
 import { MetaProvider } from './shared/contexts/MetaContext'
 import { UnsavedChangesProvider, useUnsavedChanges } from './shared/contexts/UnsavedChangesContext'
@@ -28,12 +28,40 @@ function AppInner() {
   const [trackers, setTrackers] = useState([])
   const [currentTab, setCurrentTab] = useState('tracker')
 
-  // Tab-switch scroll behavior: reset to top, EXCEPT for Todo
-  // (Todo preserves its editor scroll position, OneNote-style).
-  // Reset multiple targets because mobile Safari/Chrome may scroll body
-  // or documentElement instead of .app-main depending on layout collapse.
+  // Saved scroll positions for Todo (OneNote-style preservation across
+  // tab switches). Browsers don't always preserve scrollTop on display:none,
+  // so save/restore manually.
+  const todoScrollRef = useRef({ editor: 0, sidebar: 0, screen: 0 })
+
+  function captureTodoScroll() {
+    const editor = document.querySelector('.todo-editor')
+    const sidebar = document.querySelector('.project-sidebar')
+    const screen = document.querySelector('.todo-screen')
+    todoScrollRef.current = {
+      editor: editor?.scrollTop ?? 0,
+      sidebar: sidebar?.scrollTop ?? 0,
+      screen: screen?.scrollTop ?? 0,
+    }
+  }
+
+  function restoreTodoScroll() {
+    const editor = document.querySelector('.todo-editor')
+    const sidebar = document.querySelector('.project-sidebar')
+    const screen = document.querySelector('.todo-screen')
+    const s = todoScrollRef.current
+    if (editor) editor.scrollTop = s.editor
+    if (sidebar) sidebar.scrollTop = s.sidebar
+    if (screen) screen.scrollTop = s.screen
+  }
+
+  // Tab-switch scroll behavior:
+  //   - Switching INTO Todo: restore saved Todo scroll positions (OneNote-style).
+  //   - Switching INTO other tabs: reset to top.
   useEffect(() => {
-    if (currentTab === 'todo') return
+    if (currentTab === 'todo') {
+      requestAnimationFrame(restoreTodoScroll)
+      return
+    }
     const am = document.querySelector('.app-main')
     if (am) am.scrollTop = 0
     window.scrollTo(0, 0)
@@ -50,6 +78,8 @@ function AppInner() {
     if (tabId === currentTab) return
     const ok = await ensureSaved()
     if (!ok) return
+    // Capture Todo scroll BEFORE leaving so restore on return is accurate.
+    if (currentTab === 'todo') captureTodoScroll()
     setCurrentTab(tabId)
   }, [currentTab, ensureSaved])
 

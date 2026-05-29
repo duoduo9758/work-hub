@@ -61,6 +61,8 @@
   .todo-screen {
     flex-direction: column;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
   .project-sidebar {
     min-width: 0;
