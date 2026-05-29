@@ -46,20 +46,24 @@ export default function LeaveSummary({ records }) {
           <span className="leave-summary__label">今年度取得済み</span>
           <span className="leave-summary__value">{formatHours(paidUsed)}</span>
         </div>
-        <div className={'leave-summary__row leave-summary__row--rule ' +
-          (fullDaysOk ? 'leave-summary__row--ok' : 'leave-summary__row--warn')}>
-          <span className="leave-summary__label">丸1日取得</span>
-          <span className="leave-summary__value">
-            {fullDays} / {PAID_FULL_DAYS_REQUIRED}日
-            <span className="leave-summary__note">
-              {fullDaysOk ? '（達成）' : '（未達、会社ルール目安）'}
-            </span>
-          </span>
-        </div>
-        {noPaidAdj && (
+        {noPaidAdj ? (
+          // AC-LEAVE-B02: when current-year adjustment is missing, suppress
+          // the 5-day-rule row to keep messaging focused (annual award
+          // missing → balance can't even be measured). Hint goes first.
           <p className="leave-summary__hint" role="status">
             現在年度の調整レコードがありません。年度付与を入力してください
           </p>
+        ) : (
+          <div className={'leave-summary__row leave-summary__row--rule ' +
+            (fullDaysOk ? 'leave-summary__row--ok' : 'leave-summary__row--warn')}>
+            <span className="leave-summary__label">丸1日取得</span>
+            <span className="leave-summary__value">
+              {fullDays} / {PAID_FULL_DAYS_REQUIRED}日
+              <span className="leave-summary__note">
+                {fullDaysOk ? '（達成）' : '（未達、会社ルール目安）'}
+              </span>
+            </span>
+          </div>
         )}
       </div>
 

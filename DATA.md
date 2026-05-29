@@ -656,6 +656,8 @@ Todo・休暇等で再利用。
 
 ### 8b-4b. 休暇 transaction 擬似コード（v3 で実装、v0.5 追加）
 
+> **v3 実装時の注意（v0.8.1）**：Firebase JS SDK v9 の `runTransaction` は `tx.get(documentRef)` のみサポートし、`tx.get(query)` は **使用不可**。以下の擬似コードは設計上の意図を示すが、実装では「getDocs で先に同 leaveType を読む（tx 外）→ tx 内で対象 doc の version check + write」のパターンに置き換える。個人利用前提のため、getDocs と write の間の race window は許容（src/features/leave/leave-actions.js 参照）。
+
 leaveRecords の use / adjustment 追加・編集・削除すべてで以下のパターンを使う：
 
 ```js

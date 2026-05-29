@@ -125,12 +125,23 @@ export function filterRecordsByYear(records, mode, leaveYear = null) {
 }
 
 // ── Sort: date desc, then createdAt desc (matches DATA.md indexing) ─────
+// createdAt can arrive as a Firestore Timestamp (after re-load), a JS Date
+// (returned synchronously by addLeaveRecord before re-fetch), or undefined.
+// Normalize all three to millis so newly-added rows sort correctly next to
+// previously-loaded rows.
+function tsToMillis(t) {
+  if (t == null) return 0
+  if (typeof t === 'number') return t
+  if (t instanceof Date) return t.getTime()
+  if (typeof t.toMillis === 'function') return t.toMillis()
+  if (typeof t.seconds === 'number') return t.seconds * 1000 + Math.floor((t.nanoseconds ?? 0) / 1e6)
+  return 0
+}
+
 export function sortRecords(records) {
   return [...records].sort((a, b) => {
     if (a.date !== b.date) return a.date < b.date ? 1 : -1
-    const ac = a.createdAt ?? 0
-    const bc = b.createdAt ?? 0
-    return bc - ac
+    return tsToMillis(b.createdAt) - tsToMillis(a.createdAt)
   })
 }
 
