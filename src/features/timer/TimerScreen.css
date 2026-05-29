@@ -1,0 +1,164 @@
+/* ── Timer Screen ─────────────────────────────────────────────────────── */
+.timer-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 32px 16px 80px;
+  min-height: 100%;
+}
+
+/* ── Mode Toggle ──────────────────────────────────────────────────────── */
+.timer-mode-toggle {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.timer-mode-toggle__btn {
+  flex: 1;
+  padding: 8px 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.timer-mode-toggle__btn--active {
+  background: var(--color-primary-bg);
+  color: var(--color-primary-fg);
+}
+
+.timer-mode-toggle__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Countdown Input ──────────────────────────────────────────────────── */
+.timer-cd-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timer-cd-input__num {
+  width: 64px;
+  padding: 10px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 1.5rem;
+  text-align: center;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  -moz-appearance: textfield;
+}
+
+.timer-cd-input__num::-webkit-inner-spin-button,
+.timer-cd-input__num::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.timer-cd-input__num:disabled {
+  opacity: 0.45;
+}
+
+.timer-cd-input__sep {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+/* ── Display ──────────────────────────────────────────────────────────── */
+.timer-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.timer-display__time {
+  font-size: clamp(3rem, 12vw, 5rem);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s;
+}
+
+.timer-display--finished .timer-display__time {
+  color: #c0392b;
+}
+
+.timer-display__msg {
+  font-size: 1rem;
+  color: #c0392b;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ── Controls ─────────────────────────────────────────────────────────── */
+.timer-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.timer-controls__btn {
+  min-width: 88px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  font-size: 0.9375rem;
+  cursor: pointer;
+  background: transparent;
+  color: var(--color-text);
+  transition: background 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+
+.timer-controls__btn--primary {
+  background: var(--color-primary-bg);
+  color: var(--color-primary-fg);
+  border-color: var(--color-primary-bg);
+}
+
+.timer-controls__btn--secondary {
+  background: transparent;
+  color: var(--color-text);
+}
+
+.timer-controls__btn--dim {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.timer-controls__btn:disabled {
+  cursor: not-allowed;
+}
+
+/* ── Sound Toggle ─────────────────────────────────────────────────────── */
+.timer-sound-toggle {
+  padding: 6px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  background: transparent;
+  color: var(--color-text-muted);
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.timer-sound-toggle--on {
+  background: var(--color-primary-bg);
+  color: var(--color-primary-fg);
+  border-color: var(--color-primary-bg);
+}
+
+.timer-sound-toggle--off {
+  opacity: 0.55;
+}

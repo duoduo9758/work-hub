@@ -7,6 +7,7 @@ import HeaderBar from './screens/HeaderBar'
 import TrackerList from './features/tracker/TrackerList'
 import TodoScreen from './features/todo/TodoScreen'
 import LeaveScreen from './features/leave/LeaveScreen'
+import TimerScreen from './features/timer/TimerScreen'
 import Spinner from './shared/components/Spinner'
 import './App.css'
 
@@ -15,7 +16,7 @@ const TABS = [
   { id: 'tracker', label: 'トラッカー', enabled: true },
   { id: 'todo', label: 'Todo', enabled: true },
   { id: 'leave', label: '休暇', enabled: true },
-  { id: 'timer', label: 'タイマー', enabled: false },
+  { id: 'timer', label: 'タイマー', enabled: true },
 ]
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -107,6 +108,13 @@ function AppInner() {
             aria-hidden={currentTab !== 'leave'}
           >
             <LeaveScreen />
+          </div>
+          <div
+            className="app-pane"
+            style={{ display: currentTab === 'timer' ? 'block' : 'none' }}
+            aria-hidden={currentTab !== 'timer'}
+          >
+            <TimerScreen />
           </div>
         </main>
 
