@@ -1,13 +1,10 @@
 .header-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
+  flex-shrink: 0;
   background: var(--color-primary-bg);
   color: var(--color-primary-fg);
   height: 44px;
   overflow: hidden;
+  z-index: 100;
 }
 
 /* Empty placeholder when no pin — pushes logout to the right */

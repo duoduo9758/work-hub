@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: row;
   flex: 1;
+  min-height: 0;
   background: var(--color-bg);
 }
 
@@ -55,10 +56,11 @@
   text-align: center;
 }
 
-/* ── Mobile (375px range): stack sidebar on top ────── */
+/* ── Mobile (375px range): stack sidebar on top, scroll inside .todo-screen ── */
 @media (max-width: 639px) {
   .todo-screen {
     flex-direction: column;
+    overflow-y: auto;
   }
   .project-sidebar {
     min-width: 0;
