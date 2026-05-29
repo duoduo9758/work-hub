@@ -65,6 +65,7 @@ CHARTER.md / SPEC.md で確定したスコープ。詳細は SPEC.md 参照。
 | L12 | 複数ユーザー対応（家族・同僚と共有） | 設計が根本的に変わるため慎重に |
 | L13 | Todo保存：transaction失敗時の再fetchで「実は成功」を検知 | **症状**：単一端末で編集中にネット切断 → 保存失敗扱い → 再試行で「他端末で更新されています」モーダルが誤発火する。データロスはなく「再読み込み」で復旧可能だが UX混乱あり。**着手条件**：実害遭遇時 or マルチデバイス利用が増えたら。**実装方針**：`src/features/todo/todo-store.js` の `saveProjectLines` 内で transaction が非CONFLICTエラーで失敗した場合、`loadProject` で再fetch → 自分が送ろうとした内容と一致＋versionが+1されていればサイレント成功として扱う |
 | L14 | 休暇保存：多端末同時編集レース窓 | **症状**：端末 A/B が同一 leaveType で同時に追加・編集・削除すると、両方が「残量内」と判定して保存される。結果として残量が想定外（マイナス含む）になる可能性。**原因**：Firebase JS SDK の transaction 制約により、残量計算用の query 読み取りは transaction 外で実施。対象ドキュメントの version-check のみ transaction 内（v0.8.2 SPEC §7-5 実装変更注記）。**現状**：単一端末通常運用では整合性 OK。**着手条件**：複数端末で休暇を同時編集する運用が発生したら、または整合性破綻の実害遭遇時。**実装方針**：Cloud Functions に集約 or 楽観ロック用に leaveType 単位のサマリ doc を導入して transaction 化 |
+| L15 | iOS ホーム画面アイコンが適用されない | **症状**：`public/apple-touch-icon.png`（180x180、白底に italic serif「work / hub」）をデプロイ済みだが、iOS Safari の「ホーム画面に追加」では依然として theme-color (#18181b) + 自動生成の「w」フォールバックが表示される。ショートカット削除＋再追加、キャッシュバスター `?v=` 付き URL、PNG 化（v0.8.2 で SVG→PNG 変換）すべて試したが効果なし。**直接 URL でアクセスすると新デザインの SVG/PNG は正常表示される**ので、配信側は正常。**推測**：iOS Safari の apple-touch-icon キャッシュが非常に攻撃的、もしくは Apple のホーム画面追加フローが何らかの理由で `<link rel="apple-touch-icon">` を読まずに theme-color フォールバックを優先している。**着手条件**：本番運用で支障があれば。**調査方針**：(1) manifest.json を追加して PWA 経路で icon を提供 (2) icon URL に絶対パスや明示的なクエリを追加 (3) Apple のキャッシュ動作の公式ドキュメント再確認 (4) WebKit のフォーラム / GitHub issue 検索 |
 
 ---
 
