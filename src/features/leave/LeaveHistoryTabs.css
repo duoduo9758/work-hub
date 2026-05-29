@@ -5,12 +5,17 @@
   min-height: 0;
 }
 
+/* ── Controls row (tabs left, filter right) ─────────────────────────
+   border-top defines where the History section begins (Actions row
+   above has no separator). ────────────────────────────────────────── */
 .leave-history__controls {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-md);
-  padding: var(--space-md) var(--space-lg);
+  padding: 0 var(--space-lg);
+  min-height: 44px;
+  border-top: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
   background: var(--color-bg);
   flex-shrink: 0;
@@ -19,6 +24,8 @@
 .leave-history__tabs {
   display: flex;
   gap: var(--space-md);
+  align-self: stretch;
+  align-items: stretch;
 }
 
 .leave-history__tab {
@@ -27,12 +34,14 @@
   font-family: var(--font-family);
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-  padding: var(--space-xs) 0;
+  padding: 0;
   cursor: pointer;
   border-bottom: 2px solid transparent;
-  margin-bottom: -13px; /* align with controls bottom border */
+  margin-bottom: -1px; /* underline sits on controls' border-bottom */
   white-space: nowrap;
   transition: color 0.15s ease, border-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
 }
 
 .leave-history__tab:hover {
@@ -64,11 +73,11 @@
   background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  padding: 4px var(--space-sm);
+  padding: 3px var(--space-sm);
   cursor: pointer;
 }
 
-/* ── Empty state (structured card) ──────────────────────────────── */
+/* ── Empty state (structured card) ─────────────────────────────── */
 .leave-history__empty {
   padding: var(--space-2xl) var(--space-lg);
   display: flex;
@@ -117,12 +126,26 @@
   overflow-y: auto;
 }
 
+/* ── Mobile: stack tabs above filter for cleaner alignment ───────── */
 @media (max-width: 639px) {
   .leave-history__controls {
-    padding: var(--space-sm) var(--space-lg);
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--space-md) var(--space-lg) 0;
+    min-height: 0;
+  }
+  .leave-history__tabs {
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--space-sm);
+    margin: 0 calc(-1 * var(--space-lg)); /* full-bleed bottom border */
+    padding-left: var(--space-lg);
+    padding-right: var(--space-lg);
   }
   .leave-history__tab {
-    margin-bottom: -9px;
+    margin-bottom: -9px; /* underline meets the tabs' bottom border */
+  }
+  .leave-history__filter {
+    justify-content: flex-end;
+    padding: var(--space-sm) 0;
   }
 }

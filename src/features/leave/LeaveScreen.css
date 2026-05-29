@@ -12,25 +12,26 @@
   padding: var(--space-2xl);
 }
 
+/* ── Actions row ─────────────────────────────────────────────────────
+   No background / no border — purely whitespace between Summary and
+   History sections. Section separation is done via Summary's
+   border-bottom and History controls' border-top. ─────────────────── */
 .leave-screen__actions {
   display: flex;
   gap: var(--space-md);
-  padding: var(--space-md) var(--space-lg);
-  background: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-lg);
   flex-shrink: 0;
 }
 
 @media (min-width: 640px) {
   .leave-screen__actions {
     justify-content: flex-end;
-    padding: var(--space-md) var(--space-lg);
   }
 }
 
 @media (max-width: 639px) {
   .leave-screen__actions {
-    padding: var(--space-sm) var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
   }
   .leave-screen__actions > * {
     flex: 1;
