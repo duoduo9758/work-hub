@@ -1,8 +1,6 @@
 .todo-screen {
   display: flex;
   flex-direction: row;
-  height: 100%;
-  min-height: 0;
   flex: 1;
   background: var(--color-bg);
 }

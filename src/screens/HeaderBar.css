@@ -1,6 +1,8 @@
 .header-bar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   background: var(--color-primary-bg);
   color: var(--color-primary-fg);

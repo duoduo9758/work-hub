@@ -13,9 +13,11 @@
 /* ── Main layout ─────────────────────────────────── */
 .app-layout {
   height: 100dvh;
+  padding-top: 44px; /* reserve space for position:fixed header (44px) */
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .app-main {
