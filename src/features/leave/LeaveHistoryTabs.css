@@ -126,26 +126,19 @@
   overflow-y: auto;
 }
 
-/* ── Mobile: stack tabs above filter for cleaner alignment ───────── */
+/* ── Mobile: same single-row layout as PC, just slightly tighter ─── */
 @media (max-width: 639px) {
   .leave-history__controls {
-    flex-direction: column;
-    align-items: stretch;
-    padding: var(--space-md) var(--space-lg) 0;
-    min-height: 0;
+    padding: 0 var(--space-md);
+    gap: var(--space-sm);
   }
   .leave-history__tabs {
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: var(--space-sm);
-    margin: 0 calc(-1 * var(--space-lg)); /* full-bleed bottom border */
-    padding-left: var(--space-lg);
-    padding-right: var(--space-lg);
-  }
-  .leave-history__tab {
-    margin-bottom: -9px; /* underline meets the tabs' bottom border */
+    gap: var(--space-sm);
   }
   .leave-history__filter {
-    justify-content: flex-end;
-    padding: var(--space-sm) 0;
+    gap: var(--space-xs);
+  }
+  .leave-history__filter-select {
+    max-width: 160px;
   }
 }
