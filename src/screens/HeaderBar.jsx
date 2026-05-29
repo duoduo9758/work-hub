@@ -6,14 +6,15 @@ import './HeaderBar.css'
 // HeaderBar — global header showing the pinned tracker progress bar
 //
 // - Hidden entirely when no tracker is pinned (AC-TRK-14)
-// - PC:    title | progress bar | 残N日/全N日 | 47%
-// - Mobile: title | thin bar   | 残N日       | 47%
+// - PC:     title | progress bar | 残N日/全N日 | 47%
+// - Mobile: title | thin bar    | 残N日       | 47%
+// - Unpin is done from the Tracker card itself (no × button in the header)
 //
 // Props:
 //   trackers - array of tracker objects (needed to find pinned tracker data)
 // ═══════════════════════════════════════════════════════════════════════════
 export default function HeaderBar({ trackers }) {
-  const { pinnedTrackerId, unpinTracker } = useMeta()
+  const { pinnedTrackerId } = useMeta()
 
   // Find pinned tracker from the array
   const pinned = trackers?.find(t => t.id === pinnedTrackerId) ?? null
@@ -55,16 +56,6 @@ export default function HeaderBar({ trackers }) {
         )}
 
         <span className="header-bar__percent">{progress}%</span>
-
-        {/* Unpin button */}
-        <button
-          className="header-bar__unpin-btn"
-          onClick={unpinTracker}
-          aria-label="ピン解除"
-          title="ピン解除"
-        >
-          ×
-        </button>
       </div>
     </header>
   )
