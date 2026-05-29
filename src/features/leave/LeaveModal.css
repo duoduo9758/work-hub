@@ -91,6 +91,29 @@
   border-color: var(--color-primary-bg);
 }
 
+/* ── Date inputs (iOS / mobile readable) ───────────────────────────── */
+.leave-modal__input[type="date"] {
+  min-height: 44px;
+  font-size: 16px;
+  cursor: pointer;
+  display: block;
+}
+
+.leave-modal__input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  min-height: 1.4em;
+}
+
+.leave-modal__input[type="date"]:invalid::-webkit-datetime-edit {
+  color: var(--color-text-muted);
+}
+
+.leave-modal__input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
 .leave-modal__hint {
   font-size: var(--text-xs);
   color: var(--color-text-muted);

@@ -37,6 +37,36 @@
   border-color: var(--color-primary-bg);
 }
 
+/* ── Date inputs (iOS / mobile readable) ───────────────────────────────
+   Mobile Safari with -webkit-appearance:none hides the date placeholder
+   (年/月/日) entirely. Restore native styling on date inputs so the
+   browser draws its placeholder + native calendar picker affordance,
+   and bump font-size to 16px to suppress iOS zoom-on-focus.
+   ───────────────────────────────────────────────────────────────────── */
+.tracker-edit-modal__input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 44px;
+  font-size: 16px;
+  cursor: pointer;
+  display: block;
+}
+
+.tracker-edit-modal__input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  min-height: 1.4em;
+}
+
+.tracker-edit-modal__input[type="date"]:invalid::-webkit-datetime-edit {
+  color: var(--color-text-muted);
+}
+
+.tracker-edit-modal__input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
 /* Char count for title */
 .tracker-edit-modal__char-count {
   font-size: var(--text-sm);
