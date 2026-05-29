@@ -112,3 +112,15 @@
 .header-bar__unpin-btn:hover {
   opacity: 1;
 }
+
+/* ── Mobile editing-mode shrink (AC-TODO-M04) ─────────────────────
+   When a Todo textarea has focus on mobile, the body has class
+   `todo-editing`. Hide stats / percent / unpin to give the editor
+   more vertical room; keep title + progress bar visible. */
+@media (max-width: 639px) {
+  body.todo-editing .header-bar__stat,
+  body.todo-editing .header-bar__percent,
+  body.todo-editing .header-bar__unpin-btn {
+    display: none;
+  }
+}

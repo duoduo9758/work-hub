@@ -98,3 +98,42 @@
 .app-footer__logout:hover {
   color: var(--color-text);
 }
+
+/* ════════════════════════════════════════════════════
+   Mobile (≤ 639px): tabs become a fixed bottom nav
+   ════════════════════════════════════════════════════ */
+@media (max-width: 639px) {
+  .app-tabs {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--color-bg);
+    border-top: 1px solid var(--color-border);
+    border-bottom: none;
+    padding: 0 var(--space-sm);
+    justify-content: space-around;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .app-tabs__btn {
+    flex: 1;
+    padding: var(--space-sm) var(--space-xs);
+    font-size: var(--text-sm);
+    min-height: 48px;
+    border-bottom: none;
+    border-top: 2px solid transparent;
+    margin-bottom: 0;
+    margin-top: -1px;
+  }
+  .app-tabs__btn--active {
+    border-bottom-color: transparent;
+    border-top-color: var(--color-primary-bg);
+  }
+  /* Reserve space at the bottom of the main content so it isn't hidden
+     under the fixed tab bar. 48px button + 1px border + safe-area. */
+  .app-main,
+  .app-footer {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0));
+  }
+}

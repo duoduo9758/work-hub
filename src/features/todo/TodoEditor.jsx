@@ -137,6 +137,35 @@ export default function TodoEditor({ lines, onLinesChange, readonly = false }) {
 
   const focusConsumed = useCallback(() => setFocusRequest(null), [])
 
+  // ── Mobile header-shrink: add `todo-editing` class to <body> while any
+  // textarea inside this editor has focus. CSS uses it to shrink HeaderBar
+  // (≤639px only). Removes class on unmount and on focus exit. (AC-TODO-M04)
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    function onFocusIn(e) {
+      if (e.target?.tagName === 'TEXTAREA') {
+        document.body.classList.add('todo-editing')
+      }
+    }
+    function onFocusOut() {
+      // setTimeout so focus can settle on the next element (Tab navigation,
+      // clicking another row) before we decide whether focus left the editor.
+      setTimeout(() => {
+        if (!container.contains(document.activeElement)) {
+          document.body.classList.remove('todo-editing')
+        }
+      }, 0)
+    }
+    container.addEventListener('focusin', onFocusIn)
+    container.addEventListener('focusout', onFocusOut)
+    return () => {
+      container.removeEventListener('focusin', onFocusIn)
+      container.removeEventListener('focusout', onFocusOut)
+      document.body.classList.remove('todo-editing')
+    }
+  }, [])
+
   // ── Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z handler (AC-TODO-L22 / L29-L34) ───
   // Document-level so focus on add-row button etc. still works, but scoped
   // to the editor container so other tabs are unaffected.
