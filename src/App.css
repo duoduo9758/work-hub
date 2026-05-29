@@ -76,26 +76,28 @@
   min-height: 0;
 }
 
-/* ── Temp footer (logout only — replaced in v2+) ── */
+/* ── Footer (subtle logout link — out of the way) ── */
 .app-footer {
-  padding: var(--space-lg);
+  padding: var(--space-xs) var(--space-md);
   display: flex;
-  justify-content: center;
-  border-top: 1px solid var(--color-border);
+  justify-content: flex-end;
 }
 
 .app-footer__logout {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   color: var(--color-text-muted);
-  padding: var(--space-xs) var(--space-sm);
+  padding: var(--space-xs);
   border-radius: var(--radius-sm);
-  transition: color 0.15s ease;
+  opacity: 0.45;
+  transition: opacity 0.15s ease, color 0.15s ease;
 }
 
-.app-footer__logout:hover {
+.app-footer__logout:hover,
+.app-footer__logout:focus-visible {
+  opacity: 1;
   color: var(--color-text);
 }
 
