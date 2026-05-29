@@ -23,7 +23,6 @@
 .leave-summary__row {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
   gap: var(--space-md);
   padding: 2px 0;
 }
@@ -32,6 +31,8 @@
   font-size: var(--text-sm);
   color: var(--color-text-muted);
   white-space: nowrap;
+  min-width: 96px;
+  flex-shrink: 0;
 }
 
 .leave-summary__value {

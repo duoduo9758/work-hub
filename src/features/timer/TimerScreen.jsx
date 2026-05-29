@@ -27,7 +27,13 @@ export default function TimerScreen() {
   // running = snapshot exists; finished = countdown reached 0
   const [running, setRunning] = useState(false)
   const [finished, setFinished] = useState(false)
-  const [displayText, setDisplayText] = useState('0:00:00')
+  // Initial display matches the loaded mode (avoid showing h:mm:ss in down mode)
+  const [displayText, setDisplayText] = useState(() => {
+    const m = loadMode()
+    if (m === MODE_UP) return '0:00:00'
+    const { minutes, seconds } = loadCdSetting()
+    return formatCountDown((minutes * 60 + seconds) * 1000)
+  })
 
   const snapshotRef = useRef(null)   // in-memory mirror of persisted snapshot
   const intervalRef = useRef(null)

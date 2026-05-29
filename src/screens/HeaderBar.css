@@ -47,6 +47,7 @@
   border-radius: 2px;
   overflow: hidden;
   min-width: 40px;
+  max-width: 240px;
 }
 
 .header-bar__bar-fill {
@@ -94,6 +95,7 @@
 
 /* ── Logout (right end, subtle) ────────────────────── */
 .header-bar__logout {
+  margin-left: auto;
   background: none;
   border: 1px solid rgba(255, 255, 255, 0.25);
   color: var(--color-primary-fg);

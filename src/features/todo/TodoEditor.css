@@ -4,9 +4,16 @@
   gap: var(--space-sm);
   flex: 1;
   min-height: 0;
-  padding: var(--space-lg);
+  padding: var(--space-md) var(--space-lg) var(--space-lg) var(--space-md);
   overflow-y: auto;
   box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  /* PC: tighter left padding to connect with the sidebar visually */
+  .todo-editor {
+    padding-left: var(--space-sm);
+  }
 }
 
 .todo-editor--readonly .todo-row__textarea,
