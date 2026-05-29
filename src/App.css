@@ -76,31 +76,6 @@
   min-height: 0;
 }
 
-/* ── Footer (subtle logout link — out of the way) ── */
-.app-footer {
-  padding: var(--space-xs) var(--space-md);
-  display: flex;
-  justify-content: flex-end;
-}
-
-.app-footer__logout {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  padding: var(--space-xs);
-  border-radius: var(--radius-sm);
-  opacity: 0.45;
-  transition: opacity 0.15s ease, color 0.15s ease;
-}
-
-.app-footer__logout:hover,
-.app-footer__logout:focus-visible {
-  opacity: 1;
-  color: var(--color-text);
-}
-
 /* ════════════════════════════════════════════════════
    Mobile (≤ 639px): tabs become a fixed bottom nav
    ════════════════════════════════════════════════════ */
@@ -134,8 +109,7 @@
   }
   /* Reserve space at the bottom of the main content so it isn't hidden
      under the fixed tab bar. 48px button + 1px border + safe-area. */
-  .app-main,
-  .app-footer {
+  .app-main {
     padding-bottom: calc(56px + env(safe-area-inset-bottom, 0));
   }
 
@@ -146,8 +120,7 @@
   body.todo-editing .app-tabs {
     display: none;
   }
-  body.todo-editing .app-main,
-  body.todo-editing .app-footer {
+  body.todo-editing .app-main {
     padding-bottom: 0;
   }
 }

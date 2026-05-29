@@ -6,14 +6,11 @@
   color: var(--color-primary-fg);
   height: 44px;
   overflow: hidden;
-  transition: height 0.2s ease, opacity 0.2s ease;
 }
 
-/* Hidden state: 0-height placeholder to prevent layout jump */
-.header-bar--hidden {
-  height: 0;
-  pointer-events: none;
-  opacity: 0;
+/* Empty placeholder when no pin — pushes logout to the right */
+.header-bar__empty {
+  flex: 1;
 }
 
 /* ── Inner layout ─────────────────────────────────── */
@@ -93,5 +90,27 @@
   white-space: nowrap;
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
+}
+
+/* ── Logout (right end, subtle) ────────────────────── */
+.header-bar__logout {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: var(--color-primary-fg);
+  font-size: var(--text-xs);
+  font-family: var(--font-family);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  opacity: 0.6;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.header-bar__logout:hover,
+.header-bar__logout:focus-visible {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.12);
 }
 

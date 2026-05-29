@@ -62,7 +62,7 @@ function AppInner() {
   return (
     <MetaProvider accessCode={accessCode} initialPinnedId={initialPinnedId}>
       <div className="app-layout">
-        <HeaderBar trackers={trackers} />
+        <HeaderBar trackers={trackers} onLogout={handleLogout} />
 
         {/* Tab navigation */}
         <nav className="app-tabs" role="tablist" aria-label="主要機能">
@@ -117,12 +117,6 @@ function AppInner() {
             <TimerScreen />
           </div>
         </main>
-
-        <footer className="app-footer">
-          <button className="app-footer__logout" onClick={handleLogout}>
-            ログアウト
-          </button>
-        </footer>
       </div>
     </MetaProvider>
   )
