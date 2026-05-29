@@ -1,10 +1,27 @@
 // Timer state — pure logic + localStorage persistence.
 // Uses Date.now() diff so background tab throttling doesn't cause drift.
 //
+// ─────────────────────────────────────────────────────────────────────────
+// State machine (DO NOT change semantics during v5 UI polish)
+// ─────────────────────────────────────────────────────────────────────────
+//   idle      : no snapshot. Display shows 0:00:00 (up) or formatted cd total (down)
+//   running   : snapshot persisted. startedAt + accumulated elapsedMs progresses
+//   paused    : Stop pressed mid-run. snapshotRef retains elapsedMs in memory,
+//               but persisted snapshot is cleared (Stop is in-memory pause only;
+//               page reload after Stop = idle, not resume)
+//   finished  : countdown reached 0. Snapshot cleared, finishedFiredRef set,
+//               display shows red + "時間です" + tab title changed
+//   reset     : transitions back to idle. elapsedMs=0, all refs cleared,
+//               tab title restored
+//
+// Page restore after tab-close-during-run:
+//   Loaded snapshot is treated as paused (NOT auto-resumed).
+//   User must press Start again to continue.
+//
 // Stored keys:
 //   workHub_timer_mode      'up' | 'down'
 //   workHub_timer_sound     'on' | 'off'
-//   workHub_timer_cdMinutes number (countdown set minutes, 1-99)
+//   workHub_timer_cdMinutes number (countdown set minutes, 0-99)
 //   workHub_timer_cdSeconds number (countdown set seconds, 0-59)
 //   workHub_timer_snapshot  JSON { startedAt, elapsedMs, mode, cdTotalMs } | null
 
