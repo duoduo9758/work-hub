@@ -136,4 +136,16 @@
   .app-footer {
     padding-bottom: calc(56px + env(safe-area-inset-bottom, 0));
   }
+
+  /* iOS Safari pushes fixed-bottom elements above the soft keyboard,
+     overlapping the textarea. While editing (body.todo-editing) hide
+     the bottom nav and drop the reserved padding — the user isn't
+     switching tabs during editing anyway. */
+  body.todo-editing .app-tabs {
+    display: none;
+  }
+  body.todo-editing .app-main,
+  body.todo-editing .app-footer {
+    padding-bottom: 0;
+  }
 }
